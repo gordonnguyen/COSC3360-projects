@@ -1,8 +1,3 @@
-// Write the implementation of the member functions of the huffmanTree class here.
-
-// Huffman Tree source: https://gist.github.com/pwxcoo/72d7d3c5c3698371c21e486722f9b34b
-
-
 #include <iostream>
 #include <string>
 #include <queue>
@@ -36,14 +31,7 @@ struct comp
 	bool operator()(Node* l, Node* r)
 	{
 		// highest priority item has lowest frequency
-		if (l->freq == r->freq) {
-			// Compare by ASCII Code
-			return l->ch > r->ch;
-		}
-		else {
-			// Compare by frequency
-			return l->freq > r->freq;
-		}
+		return l->freq > r->freq;
 	}
 };
 
@@ -85,7 +73,7 @@ void decode(Node* root, int &index, string str)
 	else
 		decode(root->right, index, str);
 }
-/*
+
 // Builds Huffman Tree and decode given input text
 void buildHuffmanTree(string text)
 {
@@ -155,10 +143,11 @@ void buildHuffmanTree(string text)
 }
 
 // Huffman coding algorithm
-void mainHuff()
+int main()
 {
-	string text = "Huffman coding is a data compression algorithm.";
+	string text = "Huff";
 
 	buildHuffmanTree(text);
+
+	return 0;
 }
-*/
