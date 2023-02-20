@@ -13,7 +13,7 @@ const int SIZE = 4;
 void getCompressed();
 
 // Builds Huffman Tree and decode given input text
-void buildHuffmanTree(string text)
+int main ()
 {
 	// count frequency of appearance of each character
 	// and store it in a map
@@ -23,7 +23,7 @@ void buildHuffmanTree(string text)
 		freq[ch]++;
 	}
     */
-   
+
     freq['A'] = 3;
     freq['C'] = 3;
     freq['B'] = 1;
@@ -56,6 +56,7 @@ void buildHuffmanTree(string text)
 		pq.push(getNode('\0', sum, left, right));
 	}
 
+
 	// root stores pointer to root of Huffman Tree
 	Node* root = pq.top();
 
@@ -86,6 +87,7 @@ void buildHuffmanTree(string text)
 	while (index < (int)str.size() - 2) {
 		decode(root, index, str);
 	}
+    return 0;
 }
 
 // Huffman coding algorithm
