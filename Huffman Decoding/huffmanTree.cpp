@@ -85,6 +85,19 @@ void decode(Node* root, int &index, string str)
 	else
 		decode(root->right, index, str);
 }
+
+void inorderPrint(struct Node *root, const unordered_map<char, string> &huffmanCode) {
+   if (root != NULL) {
+      	inorderPrint(root->left, huffmanCode);
+		if (root->ch != '\0') {
+     		cout << "Symbol: " << root->ch <<", "
+			<< "Frequency: " << root->freq << ", "
+			<< "Code: " << huffmanCode.at(root->ch) << endl;
+		}
+      	inorderPrint(root->right, huffmanCode);
+   }
+}
+
 /*
 // Builds Huffman Tree and decode given input text
 void buildHuffmanTree(string text)

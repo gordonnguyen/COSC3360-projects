@@ -12,23 +12,53 @@ const int SIZE = 4;
 
 void getCompressed();
 
+
+
 // Builds Huffman Tree and decode given input text
 int main ()
 {
-	// count frequency of appearance of each character
+    std::string test;
+    int num;
+    char letter;
+    map<char, int> freq;
+    std::string text = "CACACADBD";
+    std::ofstream fout;
+    std::ifstream fin;
+    
+    std::string filename = "char.txt";
+    //cin >> filename;
+    fin.open(filename);
+
+    if (fin.is_open()){
+                std::cout << "Open success" << std::endl;
+    }
+    else {
+        std::cout << "Open failed" << std::endl;
+        return 1;
+    }
+
+    //getline(fin, test);
+    //std::cout << test;
+
+    // Read and Output sample
+    while (fin >> letter >> num) {
+        freq[letter] = num;
+        //std::cout << "loop end" << std::endl;
+    }
+    
+    // count frequency of appearance of each character
 	// and store it in a map
-	map<char, int> freq;
+
     /*
 	for (char ch: text) {
 		freq[ch]++;
 	}
-    */
 
     freq['A'] = 3;
     freq['C'] = 3;
     freq['B'] = 1;
     freq['D'] = 2;
-
+    */
 
     // Create a priority queue to store live nodes of
 	// Huffman tree;
@@ -66,9 +96,12 @@ int main ()
 	encode(root, "", huffmanCode);
 
 	cout << "Huffman Codes are :\n" << '\n';
+    /*
 	for (auto pair: huffmanCode) {
 		cout << pair.first << " " << pair.second << '\n';
 	}
+    */
+    inorderPrint(root, huffmanCode);
 
 	cout << "\nOriginal string was :\n" << text << '\n';
 
@@ -87,71 +120,11 @@ int main ()
 	while (index < (int)str.size() - 2) {
 		decode(root, index, str);
 	}
-    return 0;
-}
-
-// Huffman coding algorithm
-void mainHuff()
-{
-	string text = "CACACADBD";
-
-	buildHuffmanTree(text);
-}
-
-
-int main() {
-
-    char charList[SIZE];
-    int freqList[SIZE];
-    std::string test;
-
-    std::ofstream fout;
-    std::ifstream fin;
-    
-    std::string filename = "char.txt";
-    //cin >> filename;
-    fin.open(filename);
-
-    if (fin.is_open()){
-                std::cout << "Open success" << std::endl;
-    }
-    else {
-        std::cout << "Open failed" << std::endl;
-        return 1;
-    }
-
-    //getline(fin, test);
-    //std::cout << test;
-/*
-    fin >> charList[0];
-    fin >> freqList[0];
-    std::cout << charList[0] << " ";
-    std::cout << freqList[0];
-    //getline(fin, );
-
-*/
-    // Read and Output sample
-    /*
-    int i = 0;
-    while (fin >> charList[i] >> freqList[i]) {
-        //std::cout << i << std::endl;
-        //fin >> charList[i];
-        //fin >> freqList[i];
-        std::cout << charList[i] << " ";
-        std::cout << freqList[i] << std::endl;
-        i++;
-        //std::cout << "loop end" << std::endl;
-    }
-    */
-    mainHuff();
-    //getCompressed();
-
-    Node hufftree;
 
     return 0;
 }
 
-
+void *
 
 void getCompressed() {
     // Get Compressed file input
