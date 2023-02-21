@@ -5,7 +5,7 @@
 #include <string>
 #include <map>
 #include <sstream>
-
+#include <vector>
 #include "huffmanTree.cpp"
 
 const int SIZE = 4;
@@ -15,20 +15,41 @@ void getCompressed();
 // Builds Huffman Tree and decode given input text
 int main ()
 {
+    vector<char> charList;
+    vector<int> freqList;
+    std::string test;
+
+    std::ofstream fout;
+    std::ifstream fin;
+    
+    std::string filename = "char.txt";
+    //cin >> filename;
+    fin.open(filename);
 	// count frequency of appearance of each character
 	// and store it in a map
-	map<char, int> freq;
+    int i = 0;
+    char letter;
+    int freq;
+
+    while (fin >> letter >> freq) {
+        //std::cout << i << std::endl;
+        //fin >> charList[i];
+        //fin >> freqList[i];
+        charList.push_back(letter);
+        freqList.push_back(freq);
+        //std::cout << charList[i] << " ";
+        //std::cout << freqList[i] << std::endl;
+        //std::cout << "loop end" << std::endl;
     /*
 	for (char ch: text) {
 		freq[ch]++;
 	}
-    */
-
+    
     freq['A'] = 3;
     freq['C'] = 3;
     freq['B'] = 1;
     freq['D'] = 2;
-
+    */
 
     // Create a priority queue to store live nodes of
 	// Huffman tree;
@@ -36,8 +57,8 @@ int main ()
 
 	// Create a leaf node for each character and add it
 	// to the priority queue.
-	for (auto pair: freq) {
-		pq.push(getNode(pair.first, pair.second, nullptr, nullptr));
+	for (int i = 0; i < charList.size(); i++) {
+		pq.push(getNode(charList.at(i), freqList.at(i), nullptr, nullptr));
 	}
 
 	// do till there is more than one node in the queue
@@ -98,8 +119,8 @@ void mainHuff()
 	buildHuffmanTree(text);
 }
 
-
-int main() {
+/*
+int oldMain() {
 
     char charList[SIZE];
     int freqList[SIZE];
@@ -122,14 +143,14 @@ int main() {
 
     //getline(fin, test);
     //std::cout << test;
-/*
+
     fin >> charList[0];
     fin >> freqList[0];
     std::cout << charList[0] << " ";
     std::cout << freqList[0];
     //getline(fin, );
 
-*/
+
     // Read and Output sample
     /*
     int i = 0;
@@ -150,7 +171,6 @@ int main() {
 
     return 0;
 }
-
 
 
 void getCompressed() {
