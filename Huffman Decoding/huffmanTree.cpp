@@ -65,7 +65,7 @@ void encode(Node* root, string str,
 }
 
 // traverse the Huffman Tree and decode the encoded string
-void decode(Node* root, int &index, string str)
+void decode(Node* root, int &index, string str, char &letter)
 {
 	if (root == nullptr) {
 		return;
@@ -74,16 +74,16 @@ void decode(Node* root, int &index, string str)
 	// found a leaf node
 	if (!root->left && !root->right)
 	{
-		cout << root->ch;
+		letter = root->ch;
 		return;
 	}
 
 	index++;
 
 	if (str[index] =='0')
-		decode(root->left, index, str);
+		decode(root->left, index, str, letter);
 	else
-		decode(root->right, index, str);
+		decode(root->right, index, str, letter);
 }
 
 void inorderPrint(struct Node *root, const unordered_map<char, string> &huffmanCode) {

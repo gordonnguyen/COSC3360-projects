@@ -1,6 +1,3 @@
-// Write your program here
-
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -13,15 +10,29 @@
 
 #include "huffmanTree.cpp"
 
-//void getCompressed();
-void *decodeMessage();
-
 struct decodeArg {
     std::string huffCode;
     vector<int> pos;
     Node *root;
     vector<char> *msgPTR;
 };
+
+
+void *decodeMessage(void *decodeVoidPtr) {
+    struct decodeArg *arg = (struct decodeArg *)decodeVoidPtr;
+
+    // decode letter from huffcode
+    char letter;
+    int index = -1;
+    decode(arg->root, index, arg->huffCode, letter);
+
+    // assign letter to correct position in a vector
+    for (auto pos: arg->pos) {
+        arg->msgPTR->at(pos) = letter;
+    }
+
+    return nullptr;
+}
 
 // Builds Huffman Tree and decode given input text
 int main ()
@@ -35,9 +46,10 @@ int main ()
     std::ifstream fin;
     
     std::string filename = "char.txt";
-    //cin >> filename;
+    //std::cin >> filename;
     fin.open(filename);
 
+    /*
     if (fin.is_open()){
                 std::cout << "Open success" << std::endl;
     }
@@ -45,6 +57,7 @@ int main ()
         std::cout << "Open failed" << std::endl;
         return 1;
     }
+    */
 
     //getline(fin, test);
     //std::cout << test;
@@ -52,13 +65,14 @@ int main ()
     // Read and count frequency of appearance of each character
 	// and store it in a map
     int strSize = 0;
-    int letterCount = 0; // Count number of letters for threading
+    int letterCount = 0; // Count number of letters for threads number
     while (fin >> letter >> num) {
         strSize += num;
         freq[letter] = num;
         letterCount++;
-        //std::cout << "loop end" << std::endl;
     }
+    fin.close(); // Close file
+
 
     // Create a priority queue to store live nodes of
 	// Huffman tree;
@@ -95,65 +109,52 @@ int main ()
 	unordered_map<char, string> huffmanCode;
 	encode(root, "", huffmanCode);
 
-	cout << "Huffman Codes are :\n" << '\n';
-    /*
-	for (auto pair: huffmanCode) {
-		cout << pair.first << " " << pair.second << '\n';
-	}
-    */
+    // Print letters and its huffman Codes and frequency in inorder traversal
     inorderPrint(root, huffmanCode);
 
-    /*
-	cout << "\nOriginal string was :\n" << text << '\n';
-
-	// print encoded string
-	string str = "";
-	for (char ch: text) {
-		str += huffmanCode[ch];
-	}
-
-	cout << "\nEncoded string is :\n" << str << '\n';
-	// traverse the Huffman Tree again and this time
-	// decode the encoded string
-	int index = -1;
-	cout << "\nDecoded string is: \n";
-	while (index < (int)str.size() - 2) {
-		decode(root, index, str);
-	}
-    */
-
+    // Initilize threads and argument arrays
     vector<char> decodedMSG(strSize);  // Set vector of decoded letters to get decoded message
     pthread_t *tid = new pthread_t[letterCount];
     decodeArg *arg = new decodeArg[letterCount];
 
     // Get file name
-    std::string filename = "compressed.txt";
+    filename = "compressed.txt";
     //cin >> filename;
 
-    std::ifstream fin;
     std::string line;
     std::string huffCode;
     int position;
     fin.open(filename);
+
+    /*
+    if (fin.is_open()){
+        std::cout << "Open success" << std::endl;
+    }
+    else {
+        std::cout << "Open failed" << std::endl;
+        return 1;
+    }
+    */
+
     std::istringstream iss;
 
     int index = 0;
 
     // Read line by line then input each number to decode argument
-    while( getline(fin, line) ) {
-        std::cout << line << endl;
+    while(getline(fin, line)) {
+        //std::cout << line << endl;
         iss.str(line);
         iss >> huffCode;
-        std::cout << "huffCode: " << huffCode << endl;
-        arg[index]->huffCode = huffCode;
+        //std::cout << "huffCode: " << huffCode << endl;
+        arg[index].huffCode = huffCode;
         while(iss >> position) {    
-            std::cout << "Pos:" << position << " ";
-            arg[index]->pos.push_back(position);
+            //std::cout << "Pos:" << position << " ";
+            arg[index].pos.push_back(position);
         }
 
-        arg[index]->msgPTR = &decodedMSG; // Point to decodedMSG
-        arg[index]->root = root;
-        std::cout << endl;
+        arg[index].msgPTR = &decodedMSG; // Point to decodedMSG
+        arg[index].root = root;
+        //std::cout << endl;
         index++;
 
         iss.clear(); // Clear string stream for next line
@@ -184,20 +185,6 @@ int main ()
     return 0;
 }
 
-void *decodeMessage(void *decodeVoidPtr) {
-    struct decodeArg *arg = (decodeArg *)decodeVoidPtr;
-
-    // determine char from huffcode
-    char letter;
-    letter = decode(arg->root, -1, arg->huffCode);
-
-    // store char on vector
-    for (auto pos: arg.pos) {
-        *arg->msgPTR.at(pos) = letter;
-    }
-
-    return nullptr;
-}
 
 
 /*
