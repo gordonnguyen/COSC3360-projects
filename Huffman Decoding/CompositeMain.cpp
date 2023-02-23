@@ -8,7 +8,103 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#include "huffmanTree.cpp"
+#include <iostream>
+#include <string>
+#include <queue>
+#include <unordered_map>
+using namespace std;
+
+// A Tree node
+struct Node
+{
+	char ch;
+	int freq;
+	Node *left, *right;
+};
+
+// Function to allocate a new tree node
+Node* getNode(char ch, int freq, Node* left, Node* right)
+{
+	Node* node = new Node();
+
+	node->ch = ch;
+	node->freq = freq;
+	node->left = left;
+	node->right = right;
+
+	return node;
+}
+
+// Comparison object to be used to order the heap
+struct comp
+{
+	bool operator()(Node* l, Node* r)
+	{
+		// highest priority item has lowest frequency
+		if (l->freq == r->freq) {
+			// Compare by ASCII Code
+            if (l->ch == r->ch) {
+				return l < r;
+			}
+			return l->ch > r->ch;
+		}
+		else {
+			// Compare by frequency
+			return l->freq > r->freq;
+		}
+	}
+};
+
+// traverse the Huffman Tree and store Huffman Codes
+// in a map.
+void encode(Node* root, string str,
+			unordered_map<char, string> &huffmanCode)
+{
+	if (root == nullptr)
+		return;
+
+	// found a leaf node
+	if (!root->left && !root->right) {
+		huffmanCode[root->ch] = str;
+	}
+
+	encode(root->left, str + "0", huffmanCode);
+	encode(root->right, str + "1", huffmanCode);
+}
+
+// traverse the Huffman Tree and decode the encoded string
+void decode(Node* root, int &index, string str, char &letter)
+{
+	if (root == nullptr) {
+		return;
+	}
+
+	// found a leaf node
+	if (!root->left && !root->right)
+	{
+		letter = root->ch;
+		return;
+	}
+
+	index++;
+
+	if (str[index] =='0')
+		decode(root->left, index, str, letter);
+	else
+		decode(root->right, index, str, letter);
+}
+
+void inorderPrint(struct Node *root, const unordered_map<char, string> &huffmanCode) {
+   if (root != NULL) {
+      	inorderPrint(root->left, huffmanCode);
+		if (root->ch != '\0') {
+     		cout << "Symbol: " << root->ch <<", "
+			<< "Frequency: " << root->freq << ", "
+			<< "Code: " << huffmanCode.at(root->ch) << endl;
+		}
+      	inorderPrint(root->right, huffmanCode);
+   }
+}
 
 struct decodeArg {
     std::string huffCode;
@@ -16,6 +112,8 @@ struct decodeArg {
     Node *root;
     vector<char> *msgPTR;
 };
+
+
 
 
 void *decodeMessage(void *decodeVoidPtr) {
@@ -46,8 +144,8 @@ int main ()
     std::ofstream fout;
     std::ifstream fin;
     
-    std::string filename = "input2.txt";
-    //std::cin >> filename;
+    std::string filename; // = "input2.txt";
+    std::cin >> filename;
     fin.open(filename);
 
     /*
@@ -69,11 +167,11 @@ int main ()
     int strSize = 0;
     int letterCount = 0; // Count number of letters for threads number
     while (getline(fin, line)) {
-        std::cout << line << std::endl;
+        //std::cout << line << std::endl;
         letter = line.at(0);
         charNum = line.at(2);
         num = int(charNum) - 48;  // Convert from char to int using ASCII value
-        std::cout << "Frequency: "  << num << std::endl;
+        //std::cout << "Frequency: "  << num << std::endl;
         strSize += num;
         freq[letter] = num;
         letterCount++;
@@ -125,8 +223,8 @@ int main ()
     decodeArg *arg = new decodeArg[letterCount];
 
     // Get file name
-    filename = "compressed2.txt";
-    //cin >> filename;
+    //filename = "compressed2.txt";
+    cin >> filename;
 
     std::string huffCode;
     int position;
@@ -190,3 +288,9 @@ int main ()
 
     return 0;
 }
+
+// Write the implementation of the member functions of the huffmanTree class here.
+
+// Huffman Tree source: https://gist.github.com/pwxcoo/72d7d3c5c3698371c21e486722f9b34b
+
+
