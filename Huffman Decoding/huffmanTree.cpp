@@ -1,7 +1,7 @@
 // Write the implementation of the member functions of the huffmanTree class here.
 
 // Huffman Tree source: https://gist.github.com/pwxcoo/72d7d3c5c3698371c21e486722f9b34b
-
+/#include "huffmanTree.h"
 
 #include <iostream>
 #include <string>
@@ -10,7 +10,7 @@
 using namespace std;
 
 // A Tree node
-struct Node
+struct HuffmanTree::Node
 {
 	char ch;
 	int freq;
@@ -18,7 +18,7 @@ struct Node
 };
 
 // Function to allocate a new tree node
-Node* getNode(char ch, int freq, Node* left, Node* right)
+Node* HuffmanTree::getNode(char ch, int freq, Node* left, Node* right)
 {
 	Node* node = new Node();
 
@@ -31,7 +31,7 @@ Node* getNode(char ch, int freq, Node* left, Node* right)
 }
 
 // Comparison object to be used to order the heap
-struct comp
+struct HuffmanTree::comp
 {
 	bool operator()(Node* l, Node* r)
 	{
@@ -52,7 +52,7 @@ struct comp
 
 // traverse the Huffman Tree and store Huffman Codes
 // in a map.
-void encode(Node* root, string str,
+void HuffmanTree::encode(Node* root, string str,
 			unordered_map<char, string> &huffmanCode)
 {
 	if (root == nullptr)
@@ -68,7 +68,7 @@ void encode(Node* root, string str,
 }
 
 // traverse the Huffman Tree and decode the encoded string
-void decode(Node* root, int &index, string str, char &letter)
+void HuffmanTree::decode(Node* root, int &index, string str, char &letter)
 {
 	if (root == nullptr) {
 		return;
@@ -89,7 +89,7 @@ void decode(Node* root, int &index, string str, char &letter)
 		decode(root->right, index, str, letter);
 }
 
-void inorderPrint(struct Node *root, const unordered_map<char, string> &huffmanCode) {
+void HuffmanTree::inorderPrint(struct Node *root, const unordered_map<char, string> &huffmanCode) {
    if (root != NULL) {
       	inorderPrint(root->left, huffmanCode);
 		if (root->ch != '\0') {

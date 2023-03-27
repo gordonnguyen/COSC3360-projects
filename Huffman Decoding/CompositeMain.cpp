@@ -1,18 +1,18 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <map>
 #include <sstream>
 
 #include <pthread.h>
 #include <pthread.h>
 #include <unistd.h>
 
-#include <iostream>
-#include <string>
 #include <queue>
 #include <unordered_map>
-using namespace std;
+#include <map>
+
+//// Huffman Tree source: https://gist.github.com/pwxcoo/72d7d3c5c3698371c21e486722f9b34b
+//
 
 // A Tree node
 struct Node
@@ -55,10 +55,10 @@ struct comp
 	}
 };
 
-// traverse the Huffman Tree and store Huffman Codes
+// Traverse the Huffman Tree and store Huffman Codes
 // in a map.
-void encode(Node* root, string str,
-			unordered_map<char, string> &huffmanCode)
+void encode(Node* root, std::string str,
+			std::unordered_map<char, std::string> &huffmanCode)
 {
 	if (root == nullptr)
 		return;
@@ -72,8 +72,8 @@ void encode(Node* root, string str,
 	encode(root->right, str + "1", huffmanCode);
 }
 
-// traverse the Huffman Tree and decode the encoded string
-void decode(Node* root, int &index, string str, char &letter)
+// Traverse the Huffman Tree and decode the encoded string
+void decode(Node* root, int &index, std::string str, char &letter)
 {
 	if (root == nullptr) {
 		return;
@@ -94,28 +94,28 @@ void decode(Node* root, int &index, string str, char &letter)
 		decode(root->right, index, str, letter);
 }
 
-void inorderPrint(struct Node *root, const unordered_map<char, string> &huffmanCode) {
+// Print all huffman codes from left to right
+void inorderPrint(struct Node *root, const std::unordered_map<char, std::string> &huffmanCode) {
    if (root != NULL) {
       	inorderPrint(root->left, huffmanCode);
 		if (root->ch != '\0') {
-     		cout << "Symbol: " << root->ch <<", "
+     		std::cout << "Symbol: " << root->ch <<", "
 			<< "Frequency: " << root->freq << ", "
-			<< "Code: " << huffmanCode.at(root->ch) << endl;
+			<< "Code: " << huffmanCode.at(root->ch) << std::endl;
 		}
       	inorderPrint(root->right, huffmanCode);
    }
 }
 
+// Argument to decode
 struct decodeArg {
     std::string huffCode;
-    vector<int> pos;
+    std::vector<int> pos;
     Node *root;
-    vector<char> *msgPTR;
+    std::vector<char> *msgPTR;
 };
 
-
-
-
+// Thread function to decode message
 void *decodeMessage(void *decodeVoidPtr) {
     struct decodeArg *arg = (struct decodeArg *)decodeVoidPtr;
 
@@ -132,46 +132,33 @@ void *decodeMessage(void *decodeVoidPtr) {
     return nullptr;
 }
 
+
 // Builds Huffman Tree and decode given input text
+//
 int main ()
 {
     std::string test;
     int num;
     char letter;
     char charNum;
-    map<char, int> freq;
-    //std::string text = "CACACADBD";
+    std::map<char, int> freq;
+    
     std::ofstream fout;
     std::ifstream fin;
     
-    std::string filename; // = "input2.txt";
+    std::string filename;
     std::cin >> filename;
     fin.open(filename);
-
-    /*
-    if (fin.is_open()){
-                std::cout << "Open success" << std::endl;
-    }
-    else {
-        std::cout << "Open failed" << std::endl;
-        return 1;
-    }
-    */
-
-    //getline(fin, test);
-    //std::cout << test;
 
     // Read and count frequency of appearance of each character
 	// and store it in a map
     std::string line;
-    int strSize = 0;
+    int strSize = 0;    // Count number of characters for message
     int letterCount = 0; // Count number of letters for threads number
     while (getline(fin, line)) {
-        //std::cout << line << std::endl;
         letter = line.at(0);
         charNum = line.at(2);
         num = int(charNum) - 48;  // Convert from char to int using ASCII value
-        //std::cout << "Frequency: "  << num << std::endl;
         strSize += num;
         freq[letter] = num;
         letterCount++;
@@ -181,7 +168,7 @@ int main ()
 
     // Create a priority queue to store live nodes of
 	// Huffman tree;
-	priority_queue<Node*, vector<Node*>, comp> pq;
+	std::priority_queue<Node*, std::vector<Node*>, comp> pq;
 
 	// Create a leaf node for each character and add it
 	// to the priority queue.
@@ -211,54 +198,37 @@ int main ()
 
 	// traverse the Huffman Tree and store Huffman Codes
 	// in a map.
-	unordered_map<char, string> huffmanCode;
+	std::unordered_map<char, std::string> huffmanCode;
 	encode(root, "", huffmanCode);
 
     // Print letters and its huffman Codes and frequency in inorder traversal
     inorderPrint(root, huffmanCode);
 
     // Initilize threads and argument arrays
-    vector<char> decodedMSG(strSize);  // Set vector of decoded letters to get decoded message
+    std::vector<char> decodedMSG(strSize);  // Set vector of decoded letters to get decoded message
     pthread_t *tid = new pthread_t[letterCount];
     decodeArg *arg = new decodeArg[letterCount];
 
-    // Get file name
-    //filename = "compressed2.txt";
-    cin >> filename;
-
-    std::string huffCode;
-    int position;
+    // Get and open file name
+    std::cin >> filename;
     fin.open(filename);
 
-    /*
-    if (fin.is_open()){
-        std::cout << "Open success" << std::endl;
-    }
-    else {
-        std::cout << "Open failed" << std::endl;
-        return 1;
-    }
-    */
-
+    // Using string stream to store variables
     std::istringstream iss;
-
+    std::string huffCode;
+    int position;
     int index = 0;
-
-    // Read line by line then input each number to decode argument
+    // Read line by line then input information to decode argument struct
     while(getline(fin, line)) {
-        //std::cout << line << endl;
         iss.str(line);
         iss >> huffCode;
-        //std::cout << "huffCode: " << huffCode << endl;
         arg[index].huffCode = huffCode;
         while(iss >> position) {    
-            //std::cout << "Pos:" << position << " ";
             arg[index].pos.push_back(position);
         }
 
         arg[index].msgPTR = &decodedMSG; // Point to decodedMSG
-        arg[index].root = root;
-        //std::cout << endl;
+        arg[index].root = root;     // Point to root node
         index++;
 
         iss.clear(); // Clear string stream for next line
@@ -284,13 +254,8 @@ int main ()
     for (auto letter: decodedMSG) {
        std::cout << letter;
     }
-    std::cout << endl;
+    std::cout << std::endl;
 
     return 0;
 }
-
-// Write the implementation of the member functions of the huffmanTree class here.
-
-// Huffman Tree source: https://gist.github.com/pwxcoo/72d7d3c5c3698371c21e486722f9b34b
-
 
