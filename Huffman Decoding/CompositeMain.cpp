@@ -147,7 +147,8 @@ int main ()
     std::ifstream fin;
     
     std::string filename;
-    std::cin >> filename;
+    //std::cin >> filename;
+    filename = "input2.txt";
     fin.open(filename);
 
     // Read and count frequency of appearance of each character
@@ -210,7 +211,8 @@ int main ()
     decodeArg *arg = new decodeArg[letterCount];
 
     // Get and open file name
-    std::cin >> filename;
+    //std::cin >> filename;
+    filename = "compressed2.txt";
     fin.open(filename);
 
     // Using string stream to store variables
